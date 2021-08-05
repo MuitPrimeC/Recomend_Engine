@@ -4,6 +4,8 @@ import heapq
 import random
 import json
 import requests
+import schedule
+import time
 
 
 def cos_sim(v1, v2):
@@ -59,7 +61,7 @@ def return_recommends(hist_data, history_list):
         # 似てる人のindexから見てない映画を抽出
         recommend_candidate = np.array([history_list[i] for i in similar_vec_index])
         recommend_candidate = np.unique(np.reshape(recommend_candidate, [-1])).tolist()
-        recommend_list = [recommend_candidate.pop(recommend_candidate.index(i)) for i in user_history]
+        recommend_list = [recommend_candidate.pop(recommend_candidate.index(i)) for i in np.unique(user_history)]
 
         # おすすめリストの整頓（重複消すなど）
         for i, x in enumerate(recommend_list):
@@ -85,6 +87,7 @@ def post_recommends(user_id, recommend_list):
 
 
 def create_recommends():
+    print('Start recommend.')
     request_url = 'https://revipo.p0x0q.com/api/user/all'
     request_param = {
         "mode": "get_user"
@@ -98,7 +101,15 @@ def create_recommends():
 
     # レコメンドデータをサーバーへ返す
     return_recommends(hist_data_edited, history_list)
+    print('Recommend ended.')
 
 
-if __name__ == '__main__':
-    create_recommends()
+# 1分ごと実行
+schedule.every(1).minutes.do(create_recommends)
+while True:
+    schedule.run_pending()
+    time.sleep(1)
+
+
+# if __name__ == '__main__':
+#     create_recommends()
