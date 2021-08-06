@@ -138,11 +138,11 @@ def create_recommends():
 
 
 # 1分ごと実行
-# schedule.every(1).minutes.do(create_recommends)
-# while True:
-#     schedule.run_pending()
-#     time.sleep(1)
+schedule.every(1).minutes.do(create_recommends)
+while True:
+    schedule.run_pending()
+    time.sleep(1)
 
 
-if __name__ == '__main__':
-    create_recommends()
+# if __name__ == '__main__':
+#     create_recommends()
