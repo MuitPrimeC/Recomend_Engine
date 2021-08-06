@@ -9,10 +9,22 @@ import time
 
 
 def cos_sim(v1, v2):
+    """
+    2本のベクトルのコサイン類似度計算（ここでは1次元ベクトル同士を想定）
+    :param v1: 1次元ベクトル <np.array>
+    :param v2: 1次元ベクトル <np.array>
+    :return: 上記2本のコサイン類似度 <float>
+    """
     return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
 
 
 def shape_histdata(hist_data):
+    """
+    ユーザー履歴データの整形。
+    履歴がない人は乱数で返す。残った分は最大履歴長に合わせて-1埋めしたのち、intにして配列とdictで返す。
+    :param hist_data: user_idと履歴が入った人数分の配列 [{"user_id": <int>}, {"history": [<str>, <str>]}, ...]
+    :return: [[<int>, <int>, ...], [], ...] <np.array>, {"user_id": <int>, "history": [<int>, <int>, ...]} <dict>
+    """
     # 履歴がない人はデフォルトの値返して、データ消す
     already_return_data = []
     for data in hist_data:
@@ -46,6 +58,12 @@ def shape_histdata(hist_data):
 
 
 def return_recommends(hist_data, history_list):
+    """
+    shape_histdata()で整形したデータを使って類似度計算し、レコメンド結果をAPIに投げる
+    :param hist_data:  [[<int>, <int>, ...], [], ...] <np.array>
+    :param history_list: {"user_id": <int>, "history": [<int>, <int>, ...]} <dict>
+    :return: None
+    """
     for index in range(len(hist_data)):
         user_id = hist_data[index]['user_id']
         user_history = history_list[index]
@@ -75,6 +93,12 @@ def return_recommends(hist_data, history_list):
 
 
 def post_recommends(user_id, recommend_list):
+    """
+    レコメンドデータの書込みAPIへデータをPOST
+    :param user_id: そのまま <int>
+    :param recommend_list: 映画indexの1次元リスト [<int>, <int>, ...]
+    :return: None
+    """
     recommend_list_str = [str(movie_id) for movie_id in recommend_list]
     request_url = 'https://revipo.p0x0q.com/api/recommended'
     request_param = {
