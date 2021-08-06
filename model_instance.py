@@ -30,7 +30,7 @@ def shape_histdata(hist_data):
     already_return_data = []
     for data in hist_data:
         if len(data['history']) == 0:
-            default_data = [{random.randint(1, 10)} for i in range(3)]
+            default_data = [random.randint(1, 10) for i in range(3)]
             post_recommends(data['user_id'], default_data)
             already_return_data.append(data)
     [hist_data.pop(hist_data.index(d)) for d in already_return_data]
