@@ -6,6 +6,7 @@ import json
 import requests
 import schedule
 import time
+from pprint import pprint
 
 
 def cos_sim(v1, v2):
@@ -79,7 +80,11 @@ def return_recommends(hist_data, history_list):
         # 似てる人のindexから見てない映画を抽出
         recommend_candidate = np.array([history_list[i] for i in similar_vec_index])
         recommend_candidate = np.unique(np.reshape(recommend_candidate, [-1])).tolist()
-        recommend_list = [recommend_candidate.pop(recommend_candidate.index(i)) for i in np.unique(user_history)]
+
+        for history_movie in user_history:
+            if history_movie in recommend_candidate:
+                recommend_candidate.pop(recommend_candidate.index(history_movie))
+        recommend_list = recommend_candidate
 
         # おすすめリストの整頓（重複消すなど）
         for i, x in enumerate(recommend_list):
@@ -89,6 +94,7 @@ def return_recommends(hist_data, history_list):
             recommend_list.append(random.randint(1, 10))
             recommend_list = list(set(recommend_list))
 
+        print(recommend_list)
         post_recommends(user_id, recommend_list)
 
 
@@ -119,9 +125,12 @@ def create_recommends():
     response = requests.get(url=request_url,
                             data=json.dumps(request_param))
     hist_data = response.json()
+    # pprint(hist_data)
 
     # データを整形（履歴ない人はデフォルトで返す、-1埋め、int型変換）
     history_list, hist_data_edited = shape_histdata(hist_data)
+    # pprint(history_list)
+    # pprint(hist_data_edited)
 
     # レコメンドデータをサーバーへ返す
     return_recommends(hist_data_edited, history_list)
@@ -129,11 +138,11 @@ def create_recommends():
 
 
 # 1分ごと実行
-schedule.every(1).minutes.do(create_recommends)
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+# schedule.every(1).minutes.do(create_recommends)
+# while True:
+#     schedule.run_pending()
+#     time.sleep(1)
 
 
-# if __name__ == '__main__':
-#     create_recommends()
+if __name__ == '__main__':
+    create_recommends()
